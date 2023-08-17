@@ -1,0 +1,219 @@
+/* Reset default margin and padding */
+body,
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main container for the layout */
+.secam {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 4fr 1fr;
+  grid-template-rows: 0.5fr 1fr 6fr 0.5fr;
+  grid-template-areas:
+    'logo logo'
+    'chart clock'
+    'streaming viewPageClientLog'
+    'streaming button'
+    'footer footer';
+  grid-auto-flow: dense;
+  /* border: 2px solid black; */
+  justify-items: stretch;
+}
+
+/* Apply styling to all div elements inside .secam */
+/* .secam
+.logo,
+.streaming,
+.clock,
+.eventGraph,
+.viewpageClientLog,
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 2px solid black;
+} */
+.secam div {
+  display: flex;
+  /* flex-direction: row; */
+  justify-content: center;
+  align-items: flex;
+  /* padding: 10px; */
+  box-sizing: border-box;
+  /* border: 2px solid black; */
+}
+
+.clock,
+.eventGraph,
+.streaming {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: center;
+  box-sizing: border-box;
+  border: 2px solid black;
+}
+
+#date {
+  padding: 0px;
+  font-size: 40px;
+  padding-right: 5px;
+}
+
+#time {
+  padding: 0px;
+  font-size: 40px;
+  padding-left: 5px;
+  display: inline;
+}
+
+.eventGraph {
+  grid-area: chart;
+}
+
+.viewPageClientLog {
+  position: fixed;
+  top: 0;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 2px solid black;
+}
+
+#streamedImage {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.logo {
+  grid-area: logo;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(#121820, #122549);
+  border: 2px solid black;
+}
+
+.logo img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+}
+
+.button {
+  grid-area: button;
+  text-align: center;
+  margin-top: auto;
+  grid-auto-flow: row;
+  align-items: row;
+  border: 2px solid black;
+}
+
+
+
+.set button,
+.servoBtn button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.set button:hover,
+.servoBtn button:hover {
+  background-color: #121820;
+}
+
+.servoBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100px;
+  height: 200px;
+  padding-left: 35px;
+}
+.set {
+  flex-direction: column;
+  padding-right: 35px;
+  margin: 10px;
+}
+
+
+#button-up,
+#button-down {
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  margin: 5px;
+}
+
+#left-right-buttons {
+  display: flex;
+  margin: 10px;
+}
+
+#button-left,
+#button-right {
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+}
+
+#button-left {
+  margin-right: 20px;
+}
+
+#button-right{
+  margin-left: 0px;
+}
+
+.servoBtn button {
+  border: 1px solid #121820;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.streaming {
+  grid-area: streaming;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+}
+
+.viewPageClientLog {
+  grid-area: viewPageClientLog;
+  position: sticky;
+  top: 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+#selectedDate {
+  font-size: 15px;
+}
+
+.footer {
+  background: linear-gradient(#121820, #122549);
+  grid-area: footer;
+  text-align: center;
+  color: #dddddd;
+  padding: 10px;
+  border: 2px solid black;
+}
