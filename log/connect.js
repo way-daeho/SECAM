@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const connect = () => {
-  mongoose.connect('mongodb://waydaeho:waydaeho@localhost:27017/admin', {
+  mongoose.connect('mongodb://dbid:dbpw@localhost:27017/admin', {
     dbName: 'SECAM',
     useNewUrlParser: true,
   }).then(() => {
