@@ -6,24 +6,24 @@ var io = require("socket.io")(server);
 const axios = require("axios");
 const querystring = require("querystring");
 const bodyParser = require("body-parser");
-const mongoose = require('mongoose');
-const currentTime = new Date();
-const YMD = currentTime.toISOString().substr(0, 10);
-const time = currentTime.toLocaleTimeString("en-US", { hour12: false });
+const mongoose = require('mongoose'); // MongoDB를 VSCode에서 코드로 DB에 CRUD를 할 수 있도록 사용하는 모듈
+let currentTime = new Date(); // 현재 시간을 저장하기 위해 Date 모듈을 currentTime을 사용함
+let YMD = currentTime.toISOString().substr(0, 10); // 이벤트 발생 시, 현재 년월일을 저장함
+let time = currentTime.toLocaleTimeString("en-US", { hour12: false }); // 현재 시간을 저장함 24시간 표시제. (시,분,초 단위까지 저장)
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-const connect = require('./log/connect');
-const ClientLog = require('./log/ClientLog');
-connect();
+const connect = require('./log/connect'); // MongoDB와 연결하기 위해 작성한 모듈을 Import하기 위한 함수
+const ClientLog = require('./log/ClientLog'); // MongoDB에 있는 Collectiong(Schema)를 호출하기 위한 함수
+connect(); // MongoDB 연결
 
-app.use(express.static(path.join(__dirname,'public')));
-app.use(express.static(path.join(__dirname,'static')));
+app.use(express.static(path.join(__dirname,'public'))); // Express 환경에서 CSS 파일을 사용하기 위해 public이라는 dir을 사용하여 경로 설정
+app.use(express.static(path.join(__dirname,'static'))); // png파일을 사용하기 위해 static이라는 dir를 사용했고, 해당 파일을 import를 해주기 위한 함수
 
 app.get("/", (req, res) => {
   res.render("index", { IMAGE_STREAM_URL });
-});
+}); 
 
 // 각 Evenet 발생 시, 해당 이벤트에 맞는 값을 넣어주는 코드
 app.post("/addLog", async (req, res, next) => {
@@ -171,6 +171,8 @@ app.get('/', (req, res) => {
   res.render('index', { IMAGE_STREAM_URL });
 });
 
+
+// 해당 일에 발생한 침입 이벤트 발생 수를 차트에 출력하기 위해 pushCnt값을 불러오는 함수 (End - point)
 app.get('/getPushCntData', async (req, res) => {
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
