@@ -32,17 +32,13 @@ app.post("/addLog", async (req, res, next) => {
       time:time,
       status: req.body.status,
       level: req.body.level,
-      pushCnt:0
     });
-
-    if(newClientLog.status==="침입 감지"){
-      ClientLog.pushCnt=1;
-    }
 
     await newClientLog.save();
 
     res.status(200).json({message: 'Client Log is saved.'});
 });
+
 
 // 여기 까지가 데이터 베이스에 값 넣어주는 코드
 
@@ -170,32 +166,65 @@ app.get('/', (req, res) => {
   res.render('index', { IMAGE_STREAM_URL });
 });
 
+function cleanDateFormat(dateString) {
+  return dateString.replace(/[,\s]/g, ''); // 모든 ','와 공백을 없애는 정규표현식 사용
+}
+
+function formatDate(dateString) {
+  const [month, day, year] = dateString.split('/');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
 app.get('/getPushCntData', async (req, res) => {
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
 
+  const cleanStartDate = cleanDateFormat(startDate);
+  const cleanEndDate = cleanDateFormat(endDate);
+
+  const formattedStartDate = formatDate(cleanStartDate);
+  const formattedEndDate = formatDate(cleanEndDate);
+
   try {
-    const pushCntData = await ClientLog.aggregate([
-      {
-        $match: {
-          YMD: { $gte: startDate, $lte: endDate }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalPushCnt: { $sum: '$pushCnt' }
-        }
-      }
-    ]);
+    const logs = await ClientLog.find({ YMD: { $gte: formattedStartDate, $lte: formattedEndDate }, status: "침입 감지" }).exec();
 
-    const totalPushCnt = pushCntData.length > 0 ? pushCntData[0].totalPushCnt : 0;
+    // Generate the date range from startDate to endDate
+    const dateRange = generateDateRange(new Date(formattedStartDate), new Date(formattedEndDate));
 
-    res.json([{ totalPushCnt }]);
+    // Create an object to store intrusion counts
+    const intrusionCounts = {};
+
+    // Initialize the object with counts of 0 for each date
+    dateRange.forEach(date => {
+      const dateString = date.toISOString().substr(0, 10);
+      intrusionCounts[dateString] = 0;
+    });
+
+    // Update the counts for dates with actual intrusion logs
+    logs.forEach(log => {
+      const dateKey = log.YMD;
+      intrusionCounts[dateKey]++;
+    });
+
+    // Extract counts only and send as JSON response
+    const countsArray = Object.values(intrusionCounts);
+    res.json(countsArray);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+function generateDateRange(startDate, endDate) {
+  const dateRange = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    dateRange.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dateRange;
+}
 
 server.listen(3000);
