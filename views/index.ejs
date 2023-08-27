@@ -39,7 +39,7 @@
         <canvas id="pushCntGraph"></canvas>
       </div>
     <div class="viewPageClientLog" id="log">
-      <form id="viewLogsForm">
+      <form id="viewLogsForm" class="fixed-form">
         <label for="selectedDate" >날짜 선택:</label>
         <input type="date" id="selectedDate" name="selectedDate" required style="font-size: 15px;">
         <button type="submit" >조회</button><br>
@@ -53,11 +53,13 @@
   let mediaRecorder;
   let recordedChunks = [];
   let recordingStarted = false;
+  let firstTime = true;
   var socket = io();
 
   const streamedImage = document.getElementById('streamedImage');
   streamedImage.addEventListener('load', async ()  => {
     new Notification("침입 감지", { body: '침입이 감지되었습니다!' });
+    if(firstTime){
     try {
       const response = await fetch('/addLog', {
         method: 'POST',
@@ -70,6 +72,7 @@
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
+        firstTime=false;
       } else {
         console.log("침입 감지-정상 로그 저장 실패");
       }
@@ -89,7 +92,8 @@
         console.log("침입 감지-오류 로그 저장 실패");
       }
     }
-  });
+  }
+});
 
   const refreshImage = () => {
     const streamedImage = document.getElementById('streamedImage');
@@ -245,7 +249,7 @@
       const response = await fetch(`/getLogs?selectedDate=${selectedDate}`);
       const logs = await response.json();
       // 받아온 DB 값들을 화면에 표시
-      let logsHtml = '<ul>';
+      let logsHtml = '<div class="log-container"><ul>';
       if (logs.length === 0) { // 데이터가 없을 경우
         logsHtml += `<li>${selectedDate}일에 발생한 로그 정보가 없습니다.</li>`;
       } else {
@@ -253,7 +257,7 @@
           logsHtml += `<li>${log.time} - ${log.status} - ${log.level}</li>`;
         });
       }
-      logsHtml += '</ul>';
+      logsHtml += '</ul></div>';
       logsResult.innerHTML = logsHtml;
     } catch (error) {
       console.error(error);
@@ -264,23 +268,18 @@
   async function fetchPushCntData(startDate, endDate) {
     try {
       const response = await fetch(`/getPushCntData?startDate=${startDate}&endDate=${endDate}`);
-      const pushCntData = await response.json();
+      const pushCntValues = await response.json();
 
       const dateLabels = [];
-      const pushCntValues = [];
 
       const currentDate = new Date(startDate);
       const endDateObj = new Date(endDate);
 
       while (currentDate <= endDateObj) {
-        const currentYMD = currentDate.toISOString().substr(0, 10);
-        const foundData = pushCntData.find(data => data.YMD === currentYMD);
-
         dateLabels.push(currentDate.getDate());
-        pushCntValues.push(foundData ? foundData.pushCnt : 0);
-
         currentDate.setDate(currentDate.getDate() + 1);
       }
+      
 
       const ctx = document.getElementById('pushCntGraph').getContext('2d');
       new Chart(ctx, {
